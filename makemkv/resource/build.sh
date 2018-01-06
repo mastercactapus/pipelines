@@ -9,5 +9,6 @@ cp repo/makemkv/resource/cmd/in/in.sh $OUT/in
 cp repo/makemkv/resource/Dockerfile $OUT/
 cp repo/makemkv/resource/sign-key.asc $OUT/
 
+export CGO_ENABLED=0
 go get check/...
 go build -o $OUT/check check

@@ -14,6 +14,7 @@ gpg --verify --no-tty <makemkv-sha-$VERSION.txt
 
 for file in $(grep '.tar.gz$' makemkv-sha-$VERSION.txt | awk '{print $2}')
 do
+    echo "GET $BASE/$file" >&2
     curl -LsO $BASE/$file
 done
 

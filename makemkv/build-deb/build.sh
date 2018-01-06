@@ -19,8 +19,10 @@ install -m 644 src/eula_en_linux.txt usr/share/MakeMKV/
 echo "usr/share/MakeMKV/eula_en_linux.txt">listfile
 checkinstall -D $ARGS --pkgname=makemkv-bin --include=listfile --requires=makemkv-oss
 
-#tar xfv src/makemkv-oss-$VERSION.tar.gz
-#cd makemkv-oss-$VERSION
-#./configure
-#make
-#checkinstall -D $ARGS --pkgname=makemkv-oss
+cd ..
+
+tar xfv src/makemkv-oss-$VERSION.tar.gz
+cd makemkv-oss-$VERSION
+./configure
+make
+checkinstall -D $ARGS --pkgname=makemkv-oss
