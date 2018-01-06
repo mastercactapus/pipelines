@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-OUT=$(pwd)/resource
+OUT=$(pwd)/bin
 mkdir -p $OUT
 
 cp -r $(pwd)/repo/makemkv/resource/cmd/check $(go env GOPATH)/src/check
