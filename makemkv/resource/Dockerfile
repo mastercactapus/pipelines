@@ -1,6 +1,7 @@
 FROM alpine
 
-RUN apk add -U --no-cache gnupg curl jq && \
-    gpg --no-tty --recv-keys 94E3083A18042697
+RUN apk add -U --no-cache gnupg curl jq
+COPY sign-key.asc /root/
+RUN gpg --import </root/sign-key.asc
 
 COPY in check /opt/resource/
