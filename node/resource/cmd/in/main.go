@@ -19,6 +19,7 @@ import (
 func main() {
 	in := shared.ReadInput()
 
+	sel := in.Selected()
 	url := in.FileURL()
 	file := in.FileName()
 	sha := in.FileSHA256()
@@ -66,11 +67,18 @@ func main() {
 	}
 	res.Version.Semver = *in.Version.Semver
 	res.Metadata = []metadata{
-		{Name: "FileName", Value: file},
-		{Name: "SHA256", Value: actual},
-		{Name: "Size", Value: strconv.FormatInt(n, 10)},
-		{Name: "URL", Value: url},
-		{Name: "Version", Value: in.Version.Semver.String()},
+		{Name: "filename", Value: file},
+		{Name: "sha256", Value: actual},
+		{Name: "size", Value: strconv.FormatInt(n, 10)},
+		{Name: "url", Value: url},
+		{Name: "semver", Value: in.Version.Semver.String()},
+		{Name: "lts", Value: sel.LTS.String()},
+		{Name: "versions.npm", Value: sel.NPM},
+		{Name: "versions.modules", Value: sel.Modules},
+		{Name: "versions.openssl", Value: sel.OpenSSL},
+		{Name: "versions.uv", Value: sel.UV},
+		{Name: "versions.v8", Value: sel.V8},
+		{Name: "versions.zlib", Value: sel.Zlib},
 	}
 
 	shared.WriteOutput(res)

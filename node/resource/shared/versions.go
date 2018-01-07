@@ -29,6 +29,15 @@ func (l *LTS) UnmarshalJSON(b []byte) error {
 	*l = LTS(s)
 	return err
 }
+func (l LTS) String() string {
+	if l == "" {
+		return "no"
+	}
+	if l == "*" {
+		return "any"
+	}
+	return string(l)
+}
 func (l LTS) Match(b LTS) bool {
 	if l == "" {
 		return true
