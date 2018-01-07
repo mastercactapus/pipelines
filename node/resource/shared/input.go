@@ -2,6 +2,7 @@ package shared
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -51,41 +52,88 @@ func (in Input) FileURL() string {
 		"v"+in.Version.Semver.String()+"/"+in.FileName(),
 	)
 }
-func (in Input) FileSHA256() string {
-	url := joinURL(in.Source.URL, "v"+in.Version.Semver.String()+"/SHASUMS256.txt.asc")
-	log.Println("GET", url)
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatal("fetch SHASUMS256.txt.asc:", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		log.Fatal("non-200 response:", resp.Status)
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("read SHASUMS256.txt.asc:", err)
-	}
-
-	buf := bytes.NewBuffer(data)
-	cmd := exec.Command("gpg", "--verify", "--no-tty")
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stderr
-	cmd.Stdin = buf
-	err = cmd.Run()
-	if err != nil {
-		log.Fatal("failed to verify SHASUMS256.txt.asc")
-	}
-	lines := strings.Split(string(data), "\n")
-	file := in.FileName()
-	for _, l := range lines {
-		if strings.HasSuffix(l, file) {
-			return strings.SplitN(l, " ", 2)[0]
+func (in Input) VerifyFile(sum1, sum256 []byte) {
+	/*
+		Multiple attempts to verify the data, go as follows:
+		1. SHASUMS256.txt.asc
+		2. SHASUMS.txt.asc (will also use SHASUMS256.txt, if available)
+		3. SHASUMS256.txt
+		4. SHASUMS.txt
+	*/
+	getFile := func(name string) []byte {
+		url := joinURL(in.Source.URL, "v"+in.Version.Semver.String()+"/"+name)
+		log.Println("GET", url)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalf("fetch %s: %+v", name, err)
 		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			log.Printf("fetch %s: non-200 response: %s\n", name, resp.Status)
+			return nil
+		}
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalf("read %s: %+v", name, err)
+		}
+
+		if strings.HasSuffix(name, ".asc") {
+			buf := bytes.NewBuffer(data)
+			cmd := exec.Command("gpg", "--verify", "--no-tty")
+			cmd.Stderr = os.Stderr
+			cmd.Stdout = os.Stderr
+			cmd.Stdin = buf
+			err = cmd.Run()
+			if err != nil {
+				log.Fatalf("failed to verify %s", name)
+			}
+		}
+
+		return data
 	}
 
-	log.Fatalf("failed to find entry for '%s' in SHASUMS256.txt.asc")
-	return ""
+	file := in.FileName()
+	check := func(data []byte, sum []byte) bool {
+		if data == nil {
+			return false
+		}
+		lines := strings.Split(string(data), "\n")
+		var hash []byte
+		var err error
+		for _, l := range lines {
+			if strings.HasSuffix(l, file) {
+				hash, err = hex.DecodeString(strings.SplitN(l, " ", 2)[0])
+				if err != nil {
+					log.Fatal("decode checksum:", err)
+				}
+				break
+			}
+		}
+		if hash == nil {
+			return false
+		}
+		if !bytes.Equal(hash, sum) {
+			log.Fatal("checksum mismatch: got '%s' but expected '%s'", hex.EncodeToString(sum), hex.EncodeToString(hash))
+		}
+		return true
+	}
+
+	if check(getFile("SHASUMS256.txt.asc"), sum256) {
+		return
+	}
+	if check(getFile("SHASUMS.txt.asc"), sum1) {
+		// don't care if the file exists, but we validate if it is there
+		check(getFile("SHASUMS256.txt"), sum256)
+		return
+	}
+	if check(getFile("SHASUMS256.txt"), sum256) {
+		return
+	}
+	if check(getFile("SHASUMS.txt"), sum1) {
+		return
+	}
+	log.Println("WARNING: Could not find any checksum to validate file!!!")
+	return
 }
 
 func (in Input) Range(v semver.Version) bool {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
@@ -46,13 +47,19 @@ func main() {
 	if resp.StatusCode != 200 {
 		log.Fatal("non-200 response:", resp.Status)
 	}
-	h := sha256.New()
-	n, err := io.Copy(io.MultiWriter(h, fd), resp.Body)
+	h1 := sha1.New()
+	h256 := sha256.New()
+	n, err := io.Copy(io.MultiWriter(h1, h256, fd), resp.Body)
 	if err != nil {
 		log.Fatal("download file:", err)
 	}
 
-	actual := hex.EncodeToString(h.Sum(nil))
+	sum1 := h1.Sum(nil)
+	sum256 := h256.Sum(nil)
+
+	in.VerifyFile(sum1, sum256)
+
+	actual := hex.EncodeToString(sum256)
 	if actual != strings.ToLower(sha) {
 		log.Fatalf("checksum failed: got '%s' but expected '%s'", actual, sha)
 	}
