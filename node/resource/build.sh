@@ -9,7 +9,8 @@ GO_PKG=$GO_REPO/node/resource
 
 mkdir -p $(go env GOPATH)/src/$GO_REPO
 cp -r $(pwd)/repo/. $(go env GOPATH)/src/$GO_REPO/
-cp repo/node/resource/* $OUT/
+cp repo/node/resource/Dockerfile $OUT/
+cp repo/node/resource/sign-key.asc $OUT/
 
 export CGO_ENABLED=0
 go get $GO_PKG/...

@@ -26,7 +26,7 @@ func (in Input) Selected() Version {
 }
 
 func (in Input) LatestVersions() []Version {
-	log.Println("Fetching available version list...")
+	log.Println("Fetching available versions...")
 	c := colly.NewCollector()
 	var versions []Version
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
@@ -47,13 +47,6 @@ func (in Input) LatestVersions() []Version {
 	if len(versions) == 0 {
 		return nil
 	}
-	sort.Slice(versions, func(i, j int) bool { return versions[i].Semver.LT(versions[j].Semver) })
-
-	if in.Version.Semver == nil {
-		return []Version{versions[len(versions)-1]}
-	}
-
-	log.Println("Listing versions since", in.Version.Semver)
 
 	filtered := versions[:0]
 	for _, v := range versions {
@@ -62,6 +55,15 @@ func (in Input) LatestVersions() []Version {
 		}
 		filtered = append(filtered, v)
 	}
+	versions = filtered
 
-	return filtered
+	sort.Slice(versions, func(i, j int) bool { return versions[i].Semver.LT(versions[j].Semver) })
+
+	if in.Version.Semver == nil {
+		return []Version{versions[len(versions)-1]}
+	}
+
+	log.Println("Listing versions since", in.Version.Semver)
+
+	return versions
 }
