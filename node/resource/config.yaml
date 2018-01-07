@@ -1,0 +1,11 @@
+platform: linux
+inputs:
+  - name: repo
+outputs:
+  - name: bin
+image_resource:
+  type: docker-image
+  source:
+    repository: golang
+run:
+  path: repo/node/resource/build.sh
