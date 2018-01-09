@@ -113,19 +113,19 @@ func (in Input) VerifyFile(sum1, sum256 []byte) {
 			return false
 		}
 		if !bytes.Equal(hash, sum) {
-			log.Fatal("checksum mismatch: got '%s' but expected '%s'", hex.EncodeToString(sum), hex.EncodeToString(hash))
+			log.Fatalf("checksum mismatch: got '%s' but expected '%s'", hex.EncodeToString(sum), hex.EncodeToString(hash))
 		}
 		return true
 	}
 
-	if check(getFile("SHASUMS256.txt.asc"), sum256) {
-		return
-	}
-	if check(getFile("SHASUMS.txt.asc"), sum1) {
-		// don't care if the file exists, but we validate if it is there
-		check(getFile("SHASUMS256.txt"), sum256)
-		return
-	}
+	// if check(getFile("SHASUMS256.txt.asc"), sum256) {
+	// 	return
+	// }
+	// if check(getFile("SHASUMS.txt.asc"), sum1) {
+	// 	// don't care if the file exists, but we validate if it is there
+	// 	check(getFile("SHASUMS256.txt"), sum256)
+	// 	return
+	// }
 	if check(getFile("SHASUMS256.txt"), sum256) {
 		return
 	}
