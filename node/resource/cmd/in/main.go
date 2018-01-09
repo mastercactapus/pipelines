@@ -55,7 +55,37 @@ func main() {
 	sum1 := h1.Sum(nil)
 	sum256 := h256.Sum(nil)
 
-	in.VerifyFile(sum1, sum256)
+	in.VerifyFile(file, sum1, sum256)
+
+	if in.Params.Headers {
+		fd, err := os.Create(filepath.Join(in.OutputDir, in.HeadersName()))
+		if err != nil {
+			log.Fatal("create output file (headers):", err)
+		}
+		defer fd.Close()
+		url := in.HeadersURL()
+		log.Println("GET", url)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatal("download file:", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != 200 {
+			log.Fatal("non-200 response:", resp.Status)
+		}
+		h1 := sha1.New()
+		h256 := sha256.New()
+		_, err = io.Copy(io.MultiWriter(h1, h256, fd), resp.Body)
+		if err != nil {
+			log.Fatal("download file:", err)
+		}
+
+		sum1 := h1.Sum(nil)
+		sum256 := h256.Sum(nil)
+
+		in.VerifyFile(in.HeadersName(), sum1, sum256)
+	}
 
 	type metadata struct{ Name, Value string }
 

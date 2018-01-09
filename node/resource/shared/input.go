@@ -33,6 +33,7 @@ type Input struct {
 	}
 	Params struct {
 		Classifier string
+		Headers    bool
 	}
 	OutputDir string
 }
@@ -46,13 +47,22 @@ func (in Input) FileName() string {
 	}
 	return fmt.Sprintf("node-v%s%s.tar.gz", in.Version.Semver, spec)
 }
+func (in Input) HeadersName() string {
+	return fmt.Sprintf("node-v%s%s.tar.gz", in.Version.Semver, "-headers")
+}
+func (in Input) HeadersURL() string {
+	return joinURL(
+		in.Source.URL,
+		"v"+in.Version.Semver.String()+"/"+in.HeadersName(),
+	)
+}
 func (in Input) FileURL() string {
 	return joinURL(
 		in.Source.URL,
 		"v"+in.Version.Semver.String()+"/"+in.FileName(),
 	)
 }
-func (in Input) VerifyFile(sum1, sum256 []byte) {
+func (in Input) VerifyFile(file string, sum1, sum256 []byte) {
 	/*
 		Multiple attempts to verify the data, go as follows:
 		1. SHASUMS256.txt.asc
@@ -60,7 +70,11 @@ func (in Input) VerifyFile(sum1, sum256 []byte) {
 		3. SHASUMS256.txt
 		4. SHASUMS.txt
 	*/
+	once := make(map[string][]byte)
 	getFile := func(name string) []byte {
+		if data, ok := once[name]; ok {
+			return data
+		}
 		url := joinURL(in.Source.URL, "v"+in.Version.Semver.String()+"/"+name)
 		log.Println("GET", url)
 		resp, err := http.Get(url)
@@ -88,11 +102,10 @@ func (in Input) VerifyFile(sum1, sum256 []byte) {
 				log.Fatalf("failed to verify %s", name)
 			}
 		}
-
+		once[name] = data
 		return data
 	}
 
-	file := in.FileName()
 	check := func(data []byte, sum []byte) bool {
 		if data == nil {
 			return false
