@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/blang/semver"
 	"github.com/mastercactapus/pipelines/node/resource/shared"
@@ -23,7 +22,6 @@ func main() {
 	sel := in.Selected()
 	url := in.FileURL()
 	file := in.FileName()
-	sha := in.FileSHA256()
 
 	os.MkdirAll(in.OutputDir, 0755)
 
@@ -59,11 +57,6 @@ func main() {
 
 	in.VerifyFile(sum1, sum256)
 
-	actual := hex.EncodeToString(sum256)
-	if actual != strings.ToLower(sha) {
-		log.Fatalf("checksum failed: got '%s' but expected '%s'", actual, sha)
-	}
-
 	type metadata struct{ Name, Value string }
 
 	var res struct {
@@ -75,7 +68,7 @@ func main() {
 	res.Version.Semver = *in.Version.Semver
 	res.Metadata = []metadata{
 		{Name: "filename", Value: file},
-		{Name: "sha256", Value: actual},
+		{Name: "sha256", Value: hex.EncodeToString(sum256)},
 		{Name: "size", Value: strconv.FormatInt(n, 10)},
 		{Name: "url", Value: url},
 		{Name: "semver", Value: in.Version.Semver.String()},
