@@ -70,7 +70,6 @@ func main() {
 		{Name: "filename", Value: file},
 		{Name: "sha256", Value: hex.EncodeToString(sum256)},
 		{Name: "size", Value: strconv.FormatInt(n, 10)},
-		{Name: "url", Value: url},
 		{Name: "semver", Value: in.Version.Semver.String()},
 		{Name: "lts", Value: sel.LTS.String()},
 		{Name: "versions.npm", Value: sel.NPM},

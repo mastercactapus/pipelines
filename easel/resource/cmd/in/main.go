@@ -58,7 +58,6 @@ func main() {
 	res.Metadata = []metadata{
 		{Name: "Filename", Value: fileName},
 		{Name: "Size", Value: strconv.FormatInt(n, 10)},
-		{Name: "URL", Value: sel.URL},
 		{Name: "Version", Value: sel.Semver.String()},
 	}
 
