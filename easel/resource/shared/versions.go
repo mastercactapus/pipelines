@@ -50,7 +50,7 @@ func (in Input) LatestVersions() []Version {
 
 	filtered := versions[:0]
 	for _, v := range versions {
-		if in.Version.Semver.GT(v.Semver) {
+		if in.Version.Semver != nil && in.Version.Semver.GT(v.Semver) {
 			continue
 		}
 		filtered = append(filtered, v)
