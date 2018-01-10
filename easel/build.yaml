@@ -4,6 +4,7 @@ inputs:
   - name: src
   - name: build-repo
   - name: node
+  - name: AppImageKit
 outputs:
   - name: bin
 image_resource:
