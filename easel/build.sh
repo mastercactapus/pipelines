@@ -2,7 +2,7 @@
 set -ex
 
 apt-get update
-apt-get install -y build-essential python p7zip-full cpio
+apt-get install -y build-essential python p7zip-full cpio squashfs-tools
 
 EASEL_VERSION=$(cat src/VERSION)
 NODE_VERSION=$(cat node/VERSION)
@@ -21,4 +21,10 @@ make build/iris-lib/iris.js build/node VERSION=$EASEL_VERSION
 (cd build/iris-lib/node_modules/serialport && /usr/local/lib/node_modules/npm/bin/node-gyp-bin/node-gyp rebuild)
 find build -name node_modules -exec rm -rf {}/.bin \;
 
-cp -r easel.svg easel-driver.desktop AppRun build/. ../bin/
+cp easel.svg easel-driver.desktop AppRun build/
+
+mksquashfs build build.squashfs -root-owned -noappend
+
+FILE=../bin/EaselDriver-$EASEL_VERSION-x86_64.AppImage
+cat ../AppImageKit/runtime-x86_64 build.squashfs >$FILE
+chmod a+x $FILE
