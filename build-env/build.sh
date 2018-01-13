@@ -23,3 +23,4 @@ rm -f \
     $OUT/var/apt/lists/* || true
 
 cp repo/build-env/* $OUT/../
+echo $TARGET_ARCH >$OUT/../arch
