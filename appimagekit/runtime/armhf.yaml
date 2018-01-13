@@ -1,0 +1,13 @@
+platform: linux
+inputs:
+  - name: repo
+  - name: AppImageKit
+outputs:
+  - name: armhf
+image_resource:
+  type: docker-image
+  source:
+    repository: mutliarch/ubuntu-core
+    tag: armhf-xenial
+run:
+  path: repo/appimagekit/runtime/build.sh
