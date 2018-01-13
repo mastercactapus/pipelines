@@ -7,7 +7,7 @@ outputs:
 image_resource:
   type: docker-image
   source:
-    repository: mutliarch/ubuntu-core
+    repository: multiarch/ubuntu-core
     tag: armhf-xenial
 run:
   path: repo/appimagekit/runtime/build.sh
