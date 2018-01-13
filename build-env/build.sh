@@ -23,5 +23,3 @@ rm -f \
     $OUT/var/apt/lists/* || true
 
 cp repo/build-env/* $OUT/../
-
-echo "$SUITE-$TARGET_ARCH" >$OUT/../tag
