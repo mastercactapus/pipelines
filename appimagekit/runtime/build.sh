@@ -2,7 +2,6 @@
 set -e
 
 cd AppImageKit
-ca
 VERSION=$(cat .git/ref)-$(uname -m)
 
 bash -ex build.sh
