@@ -3,11 +3,11 @@ inputs:
   - name: repo
   - name: AppImageKit
 outputs:
-  - name: amd64
+  - name: bin
 image_resource:
   type: docker-image
   source:
-    repository: multiarch/ubuntu-core
-    tag: amd64-xenial
+    repository: ubuntu
+    tag: zesty
 run:
   path: repo/appimagekit/runtime/build.sh
