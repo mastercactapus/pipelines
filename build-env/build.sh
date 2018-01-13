@@ -8,7 +8,7 @@ apt-get -qq install -y qemu-user-static debootstrap
 
 OUT=./bin/rootfs
 
-debootstrap --foreign --arch=$TARGET_ARCH --variant=buildd --merged-usr $SUITE $OUT
+debootstrap --foreign --arch=$TARGET_ARCH --variant=buildd $SUITE $OUT
 cp /usr/bin/qemu-*-static $OUT/usr/bin/
 
 chroot $OUT /debootstrap/debootstrap --second-stage
