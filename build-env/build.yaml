@@ -1,0 +1,15 @@
+platform: linux
+inputs:
+  - name: repo
+outputs:
+  - name: bin
+image_resource:
+  type: docker-image
+  source:
+    repository: debian
+    tag: stretch
+run:
+  path: repo/build-env/build.sh
+params:
+  TARGET_ARCH: armhf
+  SUITE: stretch
