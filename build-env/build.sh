@@ -3,8 +3,8 @@ set -ex
 
 EXTRA_PKGS="git xxd zsync wget curl libarchive-dev autoconf libtool make gcc libtool libfuse-dev liblzma-dev libglib2.0-dev libssl-dev libinotifytools0-dev liblz4-dev equivs libcairo-dev desktop-file-utils libtool-bin"
 
-apt-get update
-apt-get install -y qemu-user-static debootstrap
+apt-get -qq update
+apt-get -qq install -y qemu-user-static debootstrap
 
 OUT=./bin/rootfs
 
