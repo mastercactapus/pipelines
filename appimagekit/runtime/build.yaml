@@ -3,11 +3,11 @@ inputs:
   - name: repo
   - name: AppImageKit
 outputs:
-  - name: armhf
+  - name: bin
 image_resource:
   type: docker-image
   source:
-    repository: multiarch/ubuntu-core
-    tag: armhf-xenial
+    repository: mastercactapus/build-env
+    tag: stretch-amd64
 run:
   path: repo/appimagekit/runtime/build.sh
