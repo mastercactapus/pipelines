@@ -10,19 +10,15 @@ cp bin-*/*.AppImage bin/
 cat >bin/RELEASE_BODY <<EOF
 # Easel Linux Driver v$VERSION
 
-## Usage
-
-The `armhf` build should work for ARMv6 devices and up (Raspberry Pi 2/Zero or newer).
-
-
 ### amd64
 
 - Node.js v$(cat node-amd64/VERSION)
 - AppImageKit v$(cat appimagekit-bin-amd64/version)
 
-### armhf
+### armhf (Raspberry Pi 2/3, Zero -- ARMv6)
 
 - Node.js v$(cat node-armhf/VERSION)
 - AppImageKit v$(cat appimagekit-bin-armhf/version)
 
 EOF
+cat bin/RELEASE_BODY
