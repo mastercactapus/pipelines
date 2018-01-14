@@ -1,10 +1,10 @@
 platform: linux
 inputs:
   - name: repo
-  - name: src
-  - name: build-repo
+  - name: easel
+  - name: easel-repo
   - name: node
-  - name: AppImageKit
+  - name: appimagekit-bin
 outputs:
   - name: bin
 image_resource:
