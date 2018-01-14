@@ -1,0 +1,200 @@
+resources:
+  - name: easel-resource-image
+    type: docker-image
+    source: &DOCKER
+      repository: mastercactapus/easel-resource
+      username: ((docker.user))
+      password: ((docker.pass))
+
+  - name: node-resource-image
+    type: docker-image
+    source: 
+      <<: *DOCKER
+      repository: mastercactapus/node-resource
+
+  - name: makemkv-resource-image
+    type: docker-image
+    source: &DOCKER
+      repository: mastercactapus/makemkv-resource
+      username: ((docker.user))
+      password: ((docker.pass))
+
+  - name: build-env-image
+    type: docker-image
+    source:
+      <<: *DOCKER
+      repository: mastercactapus/build-env
+
+  - name: easel-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [easel/resource]
+
+  - name: node-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [node/resource]
+
+  - name: makemkv-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [makemkv/resource]
+
+  - name: build-env-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [build-env]
+
+  - name: debian-stretch
+    type: docker-image
+    source:
+      repository: debian
+      tag: stretch
+
+  - name: golang
+    type: docker-image
+    source:
+      repository: golang
+      tag: "1.9"
+
+jobs:
+  - name: easel-resource
+    serial: true
+    plan:
+      - get: repo
+        resource: easel-repo
+        trigger: true
+      - get: golang
+        trigger: true
+      - task: build
+        file: repo/easel/resource/config.yaml
+        image: golang
+      - put: easel-resource-image
+        params: {build: bin}
+
+  - name: node-resource
+    serial: true
+    plan:
+      - get: repo
+        resource: node-repo
+        trigger: true
+      - get: golang
+        trigger: true
+      - task: build
+        file: repo/node/resource/config.yaml
+        image: golang
+      - put: node-resource-image
+        params: {build: bin}
+
+  - name: makemkv-resource
+    serial: true
+    plan:
+      - get: repo
+        resource: makemkv-repo
+        trigger: true
+      - get: golang
+        trigger: true
+      - task: build
+        file: repo/makemkv/resource/config.yaml
+        image: golang
+      - put: makemkv-resource-image
+        params: {build: bin}
+
+  - name: build-env-amd64
+    serial: true
+    plan:
+      - get: debian-stretch
+        trigger: true
+      - get: repo
+        resource: build-env-repo
+        trigger: true
+      - task: build
+        file: repo/build-env/build.yaml
+        image: debian-stretch
+        privileged: true
+        params:
+          TARGET_ARCH: amd64
+      - put: build-env-image
+        params:
+          build: bin
+          tag: bin/tag
+
+  - name: build-env-i386
+    serial: true
+    plan:
+      - get: debian-stretch
+        trigger: true
+      - get: repo
+        resource: build-env-repo
+        trigger: true
+      - task: build
+        file: repo/build-env/build.yaml
+        image: debian-stretch
+        privileged: true
+        params:
+          TARGET_ARCH: i386
+      - put: build-env-image
+        params:
+          build: bin
+          tag: bin/tag
+
+  - name: build-env-armhf
+    serial: true
+    plan:
+      - get: debian-stretch
+        trigger: true
+      - get: repo
+        resource: build-env-repo
+        trigger: true
+      - task: build
+        file: repo/build-env/build.yaml
+        image: debian-stretch
+        privileged: true
+        params:
+          TARGET_ARCH: armhf
+      - put: build-env-image
+        params:
+          build: bin
+          tag: bin/tag
+
+  - name: build-env-arm64
+    serial: true
+    plan:
+      - get: debian-stretch
+        trigger: true
+      - get: repo
+        resource: build-env-repo
+        trigger: true
+      - task: build
+        file: repo/build-env/build.yaml
+        image: debian-stretch
+        privileged: true
+        params:
+          TARGET_ARCH: arm64
+      - put: build-env-image
+        params:
+          build: bin
+          tag: bin/tag
+
+  - name: build-env-armel
+    serial: true
+    plan:
+      - get: debian-stretch
+        trigger: true
+      - get: repo
+        resource: build-env-repo
+        trigger: true
+      - task: build
+        file: repo/build-env/build.yaml
+        image: debian-stretch
+        privileged: true
+        params:
+          TARGET_ARCH: armel
+      - put: build-env-image
+        params:
+          build: bin
+          tag: bin/tag

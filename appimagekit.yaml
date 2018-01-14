@@ -1,0 +1,128 @@
+resources:
+  - name: build-env-image-amd64
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-amd64
+  - name: build-env-image-i386
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-i386
+  - name: build-env-image-armhf
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-armhf
+  - name: build-env-image-arm64
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-arm64
+  - name: build-env-image-armel
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-armel
+  - name: AppImageKit
+    type: git
+    source:
+      uri: https://github.com/AppImage/AppImageKit.git
+      tag_filter: "[0-9]*"
+    check_every: 24h
+
+  - name: appimagekit-bin
+    type: s3
+    source:
+      bucket: ((build-bucket.name))
+      region_name: ((build-bucket.region))
+      access_key_id: ((build-bucket.key))
+      secret_access_key: ((build-bucket.secret))
+      private: true
+      regexp: AppImageKit/AppImageKit-(.*).tgz
+
+  - name: appimagekit-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [appimagekit/runtime]
+
+jobs:
+
+  - name: AppImageKit-amd64
+    plan:
+      - get: repo
+        resource: appimagekit-repo
+        trigger: true
+      - get: AppImageKit
+        trigger: true
+      - get: build-env-image-amd64
+      - task: build
+        file: repo/appimagekit/runtime/build.yaml
+        image: build-env-image-amd64
+      - put: appimagekit-bin
+        params:
+          file: bin/AppImageKit-*.tgz
+
+  - name: AppImageKit-i386
+    plan:
+      - get: repo
+        resource: appimagekit-repo
+        trigger: true
+      - get: AppImageKit
+        trigger: true
+      - get: build-env-image-i386
+      - task: build
+        file: repo/appimagekit/runtime/build.yaml
+        image: build-env-image-i386
+      - put: appimagekit-bin
+        params:
+          file: bin/AppImageKit-*.tgz
+
+  - name: AppImageKit-armhf
+    serial_groups: [aik-arm]
+    plan:
+      - get: repo
+        resource: appimagekit-repo
+        trigger: true
+      - get: AppImageKit
+        trigger: true
+      - get: build-env-image-armhf
+      - task: build
+        file: repo/appimagekit/runtime/build.yaml
+        image: build-env-image-armhf
+      - put: appimagekit-bin
+        params:
+          file: bin/AppImageKit-*.tgz
+
+  - name: AppImageKit-arm64
+    serial_groups: [aik-arm]
+    plan:
+      - get: repo
+        resource: appimagekit-repo
+        trigger: true
+      - get: AppImageKit
+        trigger: true
+      - get: build-env-image-arm64
+      - task: build
+        file: repo/appimagekit/runtime/build.yaml
+        image: build-env-image-arm64
+      - put: appimagekit-bin
+        params:
+          file: bin/AppImageKit-*.tgz
+
+  - name: AppImageKit-armel
+    serial_groups: [aik-arm]
+    plan:
+      - get: repo
+        resource: appimagekit-repo
+        trigger: true
+      - get: AppImageKit
+        trigger: true
+      - get: build-env-image-armel
+      - task: build
+        file: repo/appimagekit/runtime/build.yaml
+        image: build-env-image-armel
+      - put: appimagekit-bin
+        params:
+          file: bin/AppImageKit-*.tgz

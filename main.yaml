@@ -1,0 +1,149 @@
+resource_types:
+  - name: easel
+    type: docker-image
+    source:
+      repository: mastercactapus/easel-resource
+  - name: node
+    type: docker-image
+    source:
+      repository: mastercactapus/node-resource
+  - name: makemkv
+    type: docker-image
+    source:
+      repository: mastercactapus/makemkv-resource
+
+resources:
+  - name: makemkv
+    type: makemkv
+    check_every: 1h
+  - name: node
+    type: node
+    source:
+      lts: "Boron"
+    check_every: 1h
+  - name: easel
+    type: easel
+    check_every: 1h
+
+  - name: appimagekit-bin-amd64
+    type: s3
+    source: &S3
+      bucket: ((build-bucket.name))
+      region_name: ((build-bucket.region))
+      access_key_id: ((build-bucket.key))
+      secret_access_key: ((build-bucket.secret))
+      private: true
+      regexp: AppImageKit/AppImageKit-(.*)-amd64.tgz
+
+  - name: appimagekit-bin-armhf
+    type: s3
+    source:
+      <<: *S3
+      regexp: AppImageKit/AppImageKit-(.*)-armhf.tgz
+
+  - name: makemkv-bin
+    type: s3
+    source:
+      <<: *S3
+      regexp: makemkv/makemkv-(.*).AppImage
+
+  - name: easel-release
+    type: github-release
+    source:
+      owner: mastercactapus
+      repository: easel-driver-linux
+      access_token: ((github.access))
+    check_every: 1h
+
+  - name: build-env-amd64
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-amd64
+
+  - name: build-env-armhf
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-armhf
+
+  - name: easel-driver-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/easel-driver-linux.git
+
+  - name: easel-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [easel/driver]
+
+  - name: makemkv-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [makemkv/app]
+
+jobs:
+
+  - name: makemkv
+    plan:
+      - get: makemkv
+      - get: build-env-amd64
+      - get: repo
+        resource: makemkv-repo
+      - task: build
+        file: repo/makemkv/app/build.yaml
+        image: build-env-amd64
+      - put: makemkv-bin
+        params: {file: bin/makemkv-*.AppImage}
+
+  - name: EaselDriver
+    plan:
+      - aggregate:
+        - get: repo
+          resource: easel-repo
+        - get: easel
+          trigger: true
+        - get: node-amd64
+          resource: node
+          params:
+            classifier: "linux-x64"
+            headers: true
+        - get: node-armhf
+          resource: node
+          params:
+            classifier: "linux-armv6l"
+            headers: true
+        - get: easel-driver-repo
+        - get: build-env-amd64
+        - get: build-env-armhf
+        - get: appimagekit-bin-amd64
+          params: {unpack: true}
+        - get: appimagekit-bin-armhf
+          params: {unpack: true}
+      - task: build-amd64
+        file: repo/easel/driver/build.yaml
+        image: build-env-amd64
+        input_mapping:
+          appimagekit-bin: appimagekit-bin-amd64
+          node: node-amd64
+        output_mapping:
+          bin: bin-amd64
+      - task: build-armhf
+        file: repo/easel/driver/build.yaml
+        image: build-env-armhf
+        input_mapping:
+          appimagekit-bin: appimagekit-bin-armhf
+          node: node-armhf
+        output_mapping:
+          bin: bin-armhf
+      - task: build-release
+        file: repo/easel/driver/build-release.yaml
+      - put: easel-release
+        params:
+          name: bin/RELEASE_NAME
+          tag: bin/RELEASE_NAME
+          body: bin/RELEASE_BODY
+          globs: [bin/*.AppImage]
+
