@@ -12,4 +12,4 @@ image_resource:
   source:
     repository: ubuntu
 run:
-  path: repo/easel/build.sh
+  path: repo/easel/driver/build.sh

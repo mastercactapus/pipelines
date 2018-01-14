@@ -25,6 +25,6 @@ cp easel.svg easel-driver.desktop AppRun build/
 
 mksquashfs build build.squashfs -root-owned -noappend
 
-FILE=../bin/EaselDriver-$EASEL_VERSION-$(uname -m).AppImage
+FILE=../bin/EaselDriver-$EASEL_VERSION-$(dpkg --print-architecture).AppImage
 cat ../appimagekit-bin/runtime build.squashfs >$FILE
 chmod a+x $FILE
