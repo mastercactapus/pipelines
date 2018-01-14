@@ -45,7 +45,15 @@ resources:
     type: s3
     source:
       <<: *S3
-      regexp: makemkv/makemkv-(.*).AppImage
+      regexp: makemkv/MakeMKV-(.*).AppImage
+
+  - name: linuxdeployqt
+    type: github-release
+    source:
+      owner: probonopd
+      repository: linuxdeployqt
+      pre_release: true
+    check_every: 24h
 
   - name: easel-release
     type: github-release
@@ -89,14 +97,18 @@ jobs:
   - name: makemkv
     plan:
       - get: makemkv
+        trigger: true
       - get: build-env-amd64
       - get: repo
         resource: makemkv-repo
+      - get: linuxdeployqt
+        params:
+          globs: ["*.AppImage"]
       - task: build
         file: repo/makemkv/app/build.yaml
         image: build-env-amd64
       - put: makemkv-bin
-        params: {file: bin/makemkv-*.AppImage}
+        params: {file: bin/MakeMKV-*.AppImage}
 
   - name: EaselDriver
     plan:
