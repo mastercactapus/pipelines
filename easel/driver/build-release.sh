@@ -15,7 +15,7 @@ cat >bin/RELEASE_BODY <<EOF
 - Node.js v$(cat node-amd64/VERSION)
 - AppImageKit v$(cat appimagekit-bin-amd64/version)
 
-### armhf (Raspberry Pi 2/3, Zero -- ARMv6)
+### armhf (Raspberry Pi 2/3, Zero -- ARMv7)
 
 - Node.js v$(cat node-armhf/VERSION)
 - AppImageKit v$(cat appimagekit-bin-armhf/version)
