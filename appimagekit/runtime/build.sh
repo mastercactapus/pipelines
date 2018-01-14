@@ -4,7 +4,10 @@ set -e
 cd AppImageKit
 VERSION=$(cat .git/ref)-$(uname -m)
 
-bash -ex build.sh -n
+echo "Sending build output to build.log"
+bash -ex build.sh -n >build.log
 
-mv build/out AppImageKit-$VERSION
+set -x
+
+mv out AppImageKit-$VERSION
 tar czf ../bin/AppImageKit-$VERSION.tgz AppImageKit-$VERSION
