@@ -1,0 +1,18 @@
+platform: linux
+inputs:
+  - name: repo
+  - name: easel
+  - name: node-amd64
+  - name: appimagekit-bin-amd64
+  - name: node-armhf
+  - name: appimagekit-bin-armhf
+  - name: bin-amd64
+  - name: bin-armhf
+outputs:
+  - name: bin
+image_resource:
+  type: docker-image
+  source:
+    repository: alpine
+run:
+  path: repo/easel/driver/build-release.sh
