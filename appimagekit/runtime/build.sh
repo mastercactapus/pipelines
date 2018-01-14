@@ -2,7 +2,7 @@
 set -e
 
 cd AppImageKit
-VERSION=$(cat .git/ref)-$(uname -m)
+VERSION=$(cat .git/ref)-$(dpkg --print-architecture)
 
 echo "Sending build output to build.log"
 bash -ex build.sh -n >build.log
