@@ -24,13 +24,12 @@ make install DESTDIR=../appdir
 cd ..
 
 # fix version
-sed -i "s/^Version=.*/Version=$VERSION/" appdir/usr/share/applications/makemkv.desktop
+chmod +x linuxdeployqt/*.AppImage
+./linuxdeployqt/*.AppImage --appimage-extract
 
-install -m 755 linuxdeployqt/*.AppImage /usr/bin/linuxdeployqt
+./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs
+./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable=appdir/usr/bin/mmdtsdec
+./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable=appdir/usr/bin/makemkvcon
+ARCH./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -appimage
 
-linuxdeployqt appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs
-linuxdeployqt appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable appdir/usr/bin/mmdtsdec
-linuxdeployqt appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable appdir/usr/bin/makemkvcon
-linuxdeployqt appdir/usr/share/applications/makemkv.desktop -appimage
-
-cp *.AppImage bin/
+cp MakeMKV-x86_64.AppImage bin/MakeMKV-$VERSION-x86_64.AppImage
