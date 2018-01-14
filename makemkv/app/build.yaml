@@ -1,7 +1,7 @@
 platform: linux
 inputs:
   - name: repo
-  - name: src
+  - name: makemkv
 outputs:
   - name: bin
 image_resource:
