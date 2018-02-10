@@ -63,6 +63,13 @@ resources:
       access_token: ((github.access))
     check_every: 1h
 
+  - name: handbrake-release
+    type: github-release
+    source:
+      owner: HandBrake
+      repository: HandBrake
+    check_every: 1h
+
   - name: build-env-amd64
     type: docker-image
     source:
@@ -94,7 +101,19 @@ resources:
 
 jobs:
 
-  - name: makemkv
+  - name: handbrake
+    plan:
+      - get: handbrake-release
+        params:
+          include_source_tarball: true
+      - get: build-env-amd64
+      - get: linuxdeployqt
+        params:
+          globs: ["*.AppImage"]
+          - name: makemkv
+      - task: build
+        file: repo/handbrake/app/build.yaml
+        image: build-env-amd64
     plan:
       - get: makemkv
         trigger: true
