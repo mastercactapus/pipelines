@@ -1,7 +1,7 @@
 platform: linux
 inputs:
   - name: repo
-  - name: handbrake-release
+  - name: handbrake
   - name: linuxdeployqt
 outputs:
   - name: bin

@@ -99,21 +99,31 @@ resources:
       uri: https://github.com/mastercactapus/pipelines.git
       paths: [makemkv/app]
 
+  - name: handbrake-repo
+    type: git
+    source:
+      uri: https://github.com/mastercactapus/pipelines.git
+      paths: [handbrake/app]
+      
 jobs:
 
   - name: handbrake
     plan:
-      - get: handbrake-release
+      - get: handbrake
+        resource: handbrake-release
         params:
           include_source_tarball: true
+      - get: repo
+        resource: handbrake-repo
       - get: build-env-amd64
       - get: linuxdeployqt
         params:
           globs: ["*.AppImage"]
-          - name: makemkv
       - task: build
         file: repo/handbrake/app/build.yaml
         image: build-env-amd64
+
+  - name: makemkv
     plan:
       - get: makemkv
         trigger: true
