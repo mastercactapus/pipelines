@@ -28,7 +28,6 @@ chmod +x linuxdeployqt/*.AppImage
 ./linuxdeployqt/*.AppImage --appimage-extract
 
 ./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs
-./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable=appdir/usr/bin/mmdtsdec
 ./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -bundle-non-qt-libs -executable=appdir/usr/bin/makemkvcon
 ARCH=x86_64 ./squashfs-root/AppRun appdir/usr/share/applications/makemkv.desktop -appimage
 
