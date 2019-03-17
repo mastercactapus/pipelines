@@ -9,6 +9,6 @@ image_resource:
   type: docker-image
   source:
     repository: mastercactapus/build-env
-    tag: stretch-amd64
+    tag: stretch-amd64-makemkv
 run:
   path: repo/makemkv/app/build.sh

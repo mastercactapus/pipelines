@@ -1,9 +1,6 @@
 #!/bin/sh
 set -xe
 
-apt-get -qq update
-apt-get -qq install -y libc6-dev libssl-dev libexpat1-dev libavcodec-dev libgl1-mesa-dev libqt4-dev
-
 VERSION=$(cat makemkv/VERSION)
 OUTDIR=$(pwd)/bin
 mkdir -p appdir
