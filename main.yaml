@@ -63,11 +63,11 @@ resources:
       access_token: ((github.access))
     check_every: 1h
 
-  - name: handbrake-release
-    type: github-release
+  - name: handbrake
+    type: git
     source:
-      owner: HandBrake
-      repository: HandBrake
+      uri: https://github.com/handbrake/handbrake.git
+      tag_filter: "*.*.*"
     check_every: 1h
 
   - name: build-env-amd64
@@ -75,6 +75,12 @@ resources:
     source:
       repository: mastercactapus/build-env
       tag: stretch-amd64
+
+  - name: build-env-makemkv
+    type: docker-image
+    source:
+      repository: mastercactapus/build-env
+      tag: stretch-amd64-makemkv
 
   - name: build-env-armhf
     type: docker-image
@@ -110,9 +116,6 @@ jobs:
   - name: handbrake
     plan:
       - get: handbrake
-        resource: handbrake-release
-        params:
-          include_source_tarball: true
       - get: repo
         resource: handbrake-repo
       - get: build-env-amd64
@@ -127,7 +130,7 @@ jobs:
     plan:
       - get: makemkv
         trigger: true
-      - get: build-env-amd64
+      - get: build-env-makemkv
       - get: repo
         resource: makemkv-repo
       - get: linuxdeployqt
@@ -135,7 +138,7 @@ jobs:
           globs: ["*.AppImage"]
       - task: build
         file: repo/makemkv/app/build.yaml
-        image: build-env-amd64
+        image: build-env-makemkv
       - put: makemkv-bin
         params: {file: bin/MakeMKV-*.AppImage}
 
