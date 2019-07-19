@@ -53,6 +53,7 @@ resources:
       owner: probonopd
       repository: linuxdeployqt
       pre_release: true
+      tag_filter: continuous
     check_every: 24h
 
   - name: easel-release
@@ -110,9 +111,8 @@ resources:
     source:
       uri: https://github.com/mastercactapus/pipelines.git
       paths: [handbrake/app]
-      
-jobs:
 
+jobs:
   - name: handbrake
     plan:
       - get: handbrake
@@ -140,32 +140,32 @@ jobs:
         file: repo/makemkv/app/build.yaml
         image: build-env-makemkv
       - put: makemkv-bin
-        params: {file: bin/MakeMKV-*.AppImage}
+        params: { file: bin/MakeMKV-*.AppImage }
 
   - name: EaselDriver
     plan:
       - aggregate:
-        - get: repo
-          resource: easel-repo
-        - get: easel
-          trigger: true
-        - get: node-amd64
-          resource: node
-          params:
-            classifier: "linux-x64"
-            headers: true
-        - get: node-armhf
-          resource: node
-          params:
-            classifier: "linux-armv6l"
-            headers: true
-        - get: easel-driver-repo
-        - get: build-env-amd64
-        - get: build-env-armhf
-        - get: appimagekit-bin-amd64
-          params: {unpack: true}
-        - get: appimagekit-bin-armhf
-          params: {unpack: true}
+          - get: repo
+            resource: easel-repo
+          - get: easel
+            trigger: true
+          - get: node-amd64
+            resource: node
+            params:
+              classifier: "linux-x64"
+              headers: true
+          - get: node-armhf
+            resource: node
+            params:
+              classifier: "linux-armv6l"
+              headers: true
+          - get: easel-driver-repo
+          - get: build-env-amd64
+          - get: build-env-armhf
+          - get: appimagekit-bin-amd64
+            params: { unpack: true }
+          - get: appimagekit-bin-armhf
+            params: { unpack: true }
       - task: build-amd64
         file: repo/easel/driver/build.yaml
         image: build-env-amd64
@@ -190,4 +190,3 @@ jobs:
           tag: bin/RELEASE_NAME
           body: bin/RELEASE_BODY
           globs: [bin/*.AppImage]
-
